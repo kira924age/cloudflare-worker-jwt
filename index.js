@@ -76,10 +76,13 @@ async function importKey(key, algorithm) {
 function decodePayload(raw) {
     try {
         const binaryString = atob(raw);
-        const encodedString = encodeURIComponent(binaryString).replace(/%([0-9A-F]{2})/g, (_match, p1) => {
-            return String.fromCharCode(parseInt(p1, 16));
-        });
-        return JSON.parse(decodeURIComponent(encodedString));
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        const decoder = new TextDecoder('utf-8');
+        const decodedString = decoder.decode(bytes);
+        return JSON.parse(decodedString);
     }
     catch {
         return;
